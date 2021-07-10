@@ -1,7 +1,9 @@
 from django.shortcuts import render
+from .models import Blog
 
 def home(request):
-    return render(request, 'home.html')
+    blogs = Blog.objects
+    return render(request, 'home.html', {'blogs':blogs})
 
 def new(request):
     full_text = request.GET['fulltext']
