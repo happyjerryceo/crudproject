@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 from .models import Blog
+from crudapp.form import BlogUpdate
 
 def home(request):
     blogs = Blog.objects.order_by('-id')
@@ -20,6 +21,27 @@ def postcreate(request):
     blog.pub_date = timezone.datetime.now()
     blog.save()
     return redirect('/crudapp/detail/' + str(blog.id))
+
+def update(request, blog_id):
+    blog = Blog.objects.get(id=blog_id)
+
+    if request.method =='POST':
+        form = BlogUpdate(request.POST)
+        if form.is_valid():
+            blog.title = form.cleaned_data['title']
+            blog.body = form.cleaned_data['body']
+            blog.pub_date=timezone.now()
+            blog.save()
+            return redirect('/crudapp/detail/' + str(blog.id))
+    else:
+        form = BlogUpdate(instance = blog)
+ 
+        return render(request,'update.html', {'form':form})
+
+def delete(request, blog_id):
+    blog = Blog.objects.get(id=blog_id)
+    blog.delete()
+    return redirect('/')
 
 def new(request):
     full_text = request.GET['fulltext']
